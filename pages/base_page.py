@@ -20,3 +20,17 @@ class BasePage:
     def wait_element_clickable(self, element: WebElement):
         WebDriverWait(self.driver, 3).until(
             expected_conditions.element_to_be_clickable(element))
+
+    def find_element_with_scroll(self, locator: tuple) -> WebElement:
+        element = self.driver.find_element(*locator)
+        self.scroll_to_element(element)
+        return element
+
+    def click_element(self, locator: tuple):
+        element = self.find_element_with_scroll(locator)
+        self.wait_element_clickable(element)
+        element.click()
+
+    def fill_input(self, locator: tuple, value: str):
+        element = self.find_element_with_scroll(locator)
+        element.send_keys(value)
