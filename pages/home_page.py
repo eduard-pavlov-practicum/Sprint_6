@@ -22,15 +22,19 @@ class HomePage(BasePage):
     def question_button_click(self, button: WebElement):
         self.click_element(button)
 
+    @allure.step("Убираем плашку с предупреждением про куки")
+    def hide_cookie_warning(self):
+        self.click_element(self.find_element_with_scroll(
+            self.locators.COOKIE_BUTTON))
+
     @allure.step('Ищем панель с ответом')
     def get_question_panel(self, question_item: WebElement) -> WebElement:
-        panel = self.find_element_in_block(
-            question_item, self.locators.IMPORTANT_QUESTIONS_PANEL)
-        self.wait_element_visible(panel)
-        return panel
+        return self.wait_element_visible(self.find_element_in_block(
+            question_item, self.locators.IMPORTANT_QUESTIONS_PANEL))
 
     @allure.step('Ищем вопрос "{question_text}" и получаем текст ответа')
     def get_answer_for_question(self, question_text: str) -> str:
+        self.hide_cookie_warning()
         self.find_questions_block()
         questions = self.find_questions()
 
@@ -44,11 +48,16 @@ class HomePage(BasePage):
 
         raise ValueError(f"Вопрос с текстом '{question_text}' не найден")
 
-    @allure.step('Ищем и нажимаем кнопку "Заказать" в положении {button_place.value}')
+    @allure.step('Ищем и нажимаем кнопку "Заказать" в положении {button_place}')
     def find_and_click_order_button(self, button_place: ButtonPlaces):
-        button = self.find_element_with_scroll(
-            self.locators.ORDER_BUTTONS[button_place])
-        self.wait_element_clickable(button)
+        self.hide_cookie_warning()
+        button = self.wait_element_clickable(self.find_element_with_scroll(
+            self.locators.ORDER_BUTTONS[button_place]))
         button.click()
 
         return button
+
+    @allure.step('Кликаем на логотип Яндекса')
+    def ya_click(self) -> None:
+        self.click_element(
+            self.find_element_with_scroll(self.locators.YA_LOGO))

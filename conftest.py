@@ -1,8 +1,6 @@
 import pytest
 import allure
 from selenium import webdriver
-from selenium.webdriver.support import expected_conditions
-from selenium.webdriver.support.wait import WebDriverWait
 from helpers.constants import BASE_URL
 
 

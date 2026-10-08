@@ -8,23 +8,21 @@ class BasePage:
     def __init__(self, driver):
         self.driver: WebDriver = driver
 
-    def scroll_to_element(self, element: WebElement):
+    def scroll_to_element(self, element: WebElement) -> WebElement:
         self.driver.execute_script(
             "arguments[0].scrollIntoView(true);", element)
-        self.wait_element_visible(element)
+        return self.wait_element_visible(element)
 
-    def wait_element_visible(self, element: WebElement):
-        WebDriverWait(self.driver, 3).until(
+    def wait_element_visible(self, element: WebElement) -> WebElement:
+        return WebDriverWait(self.driver, 3).until(
             expected_conditions.visibility_of(element))
 
-    def wait_element_clickable(self, element: WebElement):
-        WebDriverWait(self.driver, 3).until(
+    def wait_element_clickable(self, element: WebElement) -> WebElement:
+        return WebDriverWait(self.driver, 3).until(
             expected_conditions.element_to_be_clickable(element))
 
     def find_element_with_scroll(self, locator: tuple) -> WebElement:
-        element = self.driver.find_element(*locator)
-        self.scroll_to_element(element)
-        return element
+        return self.scroll_to_element(self.driver.find_element(*locator))
 
     def click_element(self, element: WebElement):
         self.wait_element_clickable(element)
@@ -35,6 +33,4 @@ class BasePage:
         element.send_keys(value)
 
     def find_element_in_block(self, block: WebElement, locator: tuple) -> WebElement:
-        element = block.find_element(*locator)
-        self.scroll_to_element(element)
-        return element
+        return self.scroll_to_element(block.find_element(*locator))

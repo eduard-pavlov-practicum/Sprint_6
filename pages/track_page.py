@@ -1,5 +1,4 @@
 import allure
-from selenium.webdriver.remote.webelement import WebElement
 from locators import trackpage_locators as locators
 from pages.base_page import BasePage
 
@@ -13,8 +12,3 @@ class TrackPage(BasePage):
     def scooter_click(self) -> None:
         self.click_element(
             self.find_element_with_scroll(self.locators.SCOO_LOGO))
-
-    @allure.step('Кликаем на логотип Яндекса')
-    def ya_click(self) -> None:
-        self.click_element(
-            self.find_element_with_scroll(self.locators.YA_LOGO))
