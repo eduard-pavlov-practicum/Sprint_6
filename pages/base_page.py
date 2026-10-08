@@ -26,11 +26,15 @@ class BasePage:
         self.scroll_to_element(element)
         return element
 
-    def click_element(self, locator: tuple):
-        element = self.find_element_with_scroll(locator)
+    def click_element(self, element: WebElement):
         self.wait_element_clickable(element)
         element.click()
 
     def fill_input(self, locator: tuple, value: str):
         element = self.find_element_with_scroll(locator)
         element.send_keys(value)
+
+    def find_element_in_block(self, block: WebElement, locator: tuple) -> WebElement:
+        element = block.find_element(*locator)
+        self.scroll_to_element(element)
+        return element
