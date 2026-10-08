@@ -2,6 +2,7 @@ import allure
 from selenium.webdriver.remote.webelement import WebElement
 from locators import homepage_locators as locators
 from pages.base_page import BasePage
+from helpers.constants import ButtonPlaces
 
 
 class HomePage(BasePage):
@@ -10,35 +11,44 @@ class HomePage(BasePage):
         self.locators = locators
 
     def find_questions_block(self):
-        element = self.driver.find_element(
-            *self.locators.IMPORTANT_QUESTIONS_HEADING)
-        self.scroll_to_element(element)
-        return element
+        return self.find_element_with_scroll(self.locators.IMPORTANT_QUESTIONS_HEADING)
 
     def find_questions(self):
         return self.driver.find_elements(*self.locators.IMPORTANT_QUESTIONS_ITEMS)
 
-    def find_button(self, question_item):
-        button = question_item.find_element(
-            *self.locators.IMPORTANT_QUESTIONS_BUTTON)
-        self.scroll_to_element(button)
-        return button
+    def find_question_button(self, question_item: WebElement):
+        return self.find_element_in_block(question_item, self.locators.IMPORTANT_QUESTIONS_BUTTON)
 
-    def question_button_click(self, button):
+    def question_button_click(self, button: WebElement):
+        self.click_element(button)
+
+    @allure.step('Ищем панель с ответом')
+    def get_question_panel(self, question_item: WebElement) -> WebElement:
+        panel = self.find_element_in_block(
+            question_item, self.locators.IMPORTANT_QUESTIONS_PANEL)
+        self.wait_element_visible(panel)
+        return panel
+
+    @allure.step('Ищем вопрос "{question_text}" и получаем текст ответа')
+    def get_answer_for_question(self, question_text: str) -> str:
+        self.find_questions_block()
+        questions = self.find_questions()
+
+        for item in questions:
+            button = self.find_question_button(item)
+            if button.text == question_text:
+                self.question_button_click(button)
+
+                panel = self.get_question_panel(item)
+                return panel.text
+
+        raise ValueError(f"Вопрос с текстом '{question_text}' не найден")
+
+    @allure.step('Ищем и нажимаем кнопку "Заказать" в положении {button_place.value}')
+    def find_and_click_order_button(self, button_place: ButtonPlaces):
+        button = self.find_element_with_scroll(
+            self.locators.ORDER_BUTTONS[button_place])
         self.wait_element_clickable(button)
         button.click()
 
-    @allure.step('Ищем панель с ответом')
-    def get_question_panel(self, question_item) -> WebElement:
-        return question_item.find_element(*self.locators.IMPORTANT_QUESTIONS_PANEL)
-
-    @allure.step('Ищем вопрос "{}" и выбираем его')
-    def step_search_question_and_select(self, question) -> WebElement | None:
-        self.find_questions_block
-        question_items = self.find_questions()
-        for item in question_items:
-            button = self.find_button(item)
-            if button.text == question:
-                self.question_button_click(button)
-                return item
-        return None
+        return button
